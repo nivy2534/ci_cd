@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: task-app-container
-        image: username-docker-member2/python-app:latest 
+        image: nivy2534/ci_cd:latest
         ports:
         - containerPort: 5000
         imagePullPolicy: Always

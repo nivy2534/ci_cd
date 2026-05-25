@@ -9,8 +9,8 @@ pipeline {
 
         stage('Clone') {
             steps {
-                git 'https://github.com/nivy2534/ci_cd.git'
-            }
+            		git branch: 'main', url: 'https://github.com/nivy2534/ci_cd.git'
+		}
         }
 
         stage('Build Docker Image') {

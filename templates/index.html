@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>K8s Task App</title>
+</head>
+<body>
+    <h1>Task Manager</h1>
+
+    <input id="taskInput" placeholder="Enter task">
+    <button onclick="addTask()">Add</button>
+
+    <ul id="taskList"></ul>
+
+    <script>
+        async function loadTasks() {
+            const res = await fetch("/api/tasks");
+            const data = await res.json();
+
+            const list = document.getElementById("taskList");
+            list.innerHTML = "";
+
+            data.forEach(task => {
+                const li = document.createElement("li");
+                li.textContent = task.id + ". " + task.title;
+                list.appendChild(li);
+            });
+        }
+
+        async function addTask() {
+            const input = document.getElementById("taskInput");
+
+            await fetch("/api/tasks", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({title: input.value})
+            });
+
+            input.value = "";
+            loadTasks();
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>

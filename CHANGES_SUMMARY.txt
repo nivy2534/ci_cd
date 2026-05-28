@@ -1,0 +1,167 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    TASK MANAGER APP - PERUBAHAN LENGKAP                    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📁 STRUKTUR AKHIR:
+├── app.py (✏️ DIPERBARUI)
+│   └─ Added: Delete, Edit endpoints + MySQL integration
+│
+├── requirements.txt (✏️ DIPERBARUI)
+│   └─ Added: PyMySQL
+│
+├── Dockerfile (✏️ DIPERBARUI)
+│   └─ Optimized: Python 3.11-slim base
+│
+├── Jenkinsfile (✏️ DIPERBARUI)
+│   └─ Added: GitHub webhook + MySQL deployment stages
+│
+├── templates/
+│   └── index.html (✏️ DIPERBARUI)
+│       └─ Added: Modern UI with edit modal, delete button, status toggle
+│
+├── k8s/
+│   ├── deployment.yaml (✏️ DIPERBARUI)
+│   ├── service.yaml (existing)
+│   ├── mysql-secret.yaml (🆕 BARU)
+│   ├── mysql-pv.yaml (🆕 BARU)
+│   ├── mysql-pvc.yaml (🆕 BARU)
+│   ├── mysql-deployment.yaml (🆕 BARU)
+│   └── mysql-service.yaml (🆕 BARU)
+
+═══════════════════════════════════════════════════════════════════════════
+
+✨ FITUR BARU YANG DITAMBAHKAN:
+
+1️⃣ DELETE TASK
+   - Endpoint: DELETE /api/tasks/<id>
+   - UI: Button merah di setiap task
+   - Confirmation: Dialog sebelum delete
+
+2️⃣ EDIT TASK
+   - Endpoint: PUT /api/tasks/<id>
+   - UI: Modal dialog yang elegan
+   - Fields: Title + Description
+
+3️⃣ TOGGLE STATUS
+   - Endpoint: PATCH /api/tasks/<id>/status
+   - UI: Checkbox untuk mark as completed
+   - Visual: Garis coret + background hijau
+
+4️⃣ MODERN UI
+   - Gradient background (ungu-biru)
+   - Responsive design (mobile-friendly)
+   - Modal dialog untuk edit
+   - Empty state indicator
+   - Keyboard support (Enter to add)
+
+5️⃣ MYSQL DATABASE
+   - Persistent storage untuk tasks
+   - Auto-init schema pada startup
+   - Env vars dari Kubernetes Secret
+
+6️⃣ KUBERNETES INFRASTRUCTURE
+   - MySQL deployment dengan resource limits
+   - PersistentVolume (5Gi) untuk data
+   - Secret untuk credentials
+   - ClusterIP Service untuk internal communication
+
+7️⃣ CI/CD AUTOMATION
+   - GitHub webhook integration
+   - Automated MySQL deployment
+   - Health checks & rollout verification
+   - Docker push ke Docker Hub
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 DEPLOYMENT CHECKLIST:
+
+[ ] 1. Atur GitHub Webhook
+      URL: http://<jenkins>/github-webhook/
+      
+[ ] 2. Konfigurasi Jenkins Credentials
+      - kubeconfig (Kubernetes config)
+      - dockerhub-credential (Docker Hub)
+      
+[ ] 3. Buat direktori di worker nodes
+      sudo mkdir -p /mnt/data/mysql
+      
+[ ] 4. Push ke GitHub main branch
+      git push origin main
+      
+[ ] 5. Jenkins akan otomatis trigger
+      - Build Docker image
+      - Push ke Docker Hub
+      - Deploy MySQL
+      - Deploy Task App
+      - Verify deployment
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔍 ENDPOINTS API:
+
+GET    /api/tasks              → Ambil semua tasks
+POST   /api/tasks              → Buat task baru
+PUT    /api/tasks/<id>         → Update task (title/desc)
+DELETE /api/tasks/<id>         → Hapus task
+PATCH  /api/tasks/<id>/status  → Toggle status
+
+═══════════════════════════════════════════════════════════════════════════
+
+💾 DATABASE SCHEMA:
+
+CREATE TABLE tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+═══════════════════════════════════════════════════════════════════════════
+
+⚙️ KUBERNETES DEPLOYMENT ORDER:
+
+1. mysql-secret.yaml        (Credentials)
+2. mysql-pv.yaml            (Storage)
+3. mysql-pvc.yaml           (Storage Claim)
+4. mysql-deployment.yaml    (MySQL Service)
+5. mysql-service.yaml       (MySQL Networking)
+6. deployment.yaml          (Task App)
+7. service.yaml             (App Networking)
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎨 UI ENHANCEMENTS:
+
+✓ Modern gradient background
+✓ Clean card-based task layout
+✓ Smooth hover effects & animations
+✓ Edit modal dengan form validation
+✓ Delete confirmation dialog
+✓ Status indicator (completed/pending)
+✓ Empty state message
+✓ Mobile responsive design
+✓ Keyboard support (Enter to add)
+✓ Real-time updates
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 GITHUB WEBHOOK FLOW:
+
+Push to main branch
+    ↓
+GitHub sends webhook to Jenkins
+    ↓
+Jenkins Pipeline triggered automatically
+    ↓
+├─ Clone repo
+├─ Build Docker image
+├─ Push to Docker Hub
+├─ Deploy MySQL infrastructure
+├─ Deploy Task App
+└─ Verify deployment
+
+═══════════════════════════════════════════════════════════════════════════
+
+Semua file sudah siap untuk deployment! 🎉

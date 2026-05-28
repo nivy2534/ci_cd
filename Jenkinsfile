@@ -32,5 +32,19 @@ pipeline {
                 }
             }
         }
+	stage('Deploy to K8s') {
+    		steps {
+        		withKubeConfig([credentialsId: 'kubeconfig']) {
+            		sh """
+                	if kubectl get deployment task-app -n default > /dev/null 2>&1; then
+                    		kubectl rollout restart deployment/task-app -n default
+                	else
+                    		kubectl apply -f deployment.yaml
+                    		kubectl apply -f service.yaml
+                	fi
+            		"""
+        		}
+    		}
+	}
     }
 }

@@ -39,8 +39,8 @@ pipeline {
                 	if kubectl get deployment task-app -n default > /dev/null 2>&1; then
                     		kubectl rollout restart deployment/task-app -n default
                 	else
-                    		kubectl apply -f deployment.yaml
-                    		kubectl apply -f service.yaml
+                    		kubectl apply -f k8s/deployment.yaml
+                    		kubectl apply -f k8s/service.yaml
                 	fi
             		"""
         		}

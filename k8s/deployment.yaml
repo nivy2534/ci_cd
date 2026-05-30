@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: task-app-container
-        image: nivy2534/ci_cd:v1
+        image: nivy2534/ci_cd:latest
         ports:
         - containerPort: 5000
         imagePullPolicy: Always

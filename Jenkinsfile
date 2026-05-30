@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "nivy2534/ci_cd:v1"
+        IMAGE_NAME = "nivy2534/ci_cd:v1.${BUILD_NUMBER}"
         DOCKER_REGISTRY = "https://registry.hub.docker.com"
     }
 
@@ -20,8 +20,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE_NAME .'
-                    sh 'docker tag $IMAGE_NAME nivy2534/ci_cd:latest'
+                    sh "docker build -t $IMAGE_NAME ."
+                    sh "docker tag $IMAGE_NAME nivy2534/ci_cd:latest"
                 }
             }
         }
@@ -34,7 +34,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push $IMAGE_NAME'
+                    sh "docker push $IMAGE_NAME"
                     sh 'docker push nivy2534/ci_cd:latest'
                 }
             }
@@ -43,17 +43,17 @@ pipeline {
         stage('Deploy MySQL') {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh '''
+                    sh """
                         echo "Deploying MySQL infrastructure..."
                         kubectl apply -f k8s/mysql-secret.yaml
                         kubectl apply -f k8s/mysql-pv.yaml
                         kubectl apply -f k8s/mysql-pvc.yaml
                         kubectl apply -f k8s/mysql-deployment.yaml
                         kubectl apply -f k8s/mysql-service.yaml
-                        
+
                         echo "Waiting for MySQL to be ready..."
                         kubectl wait --for=condition=ready pod -l app=mysql --timeout=300s
-                    '''
+                    """
                 }
             }
         }
@@ -61,7 +61,7 @@ pipeline {
         stage('Deploy Task App') {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh '''
+                    sh """
                         echo "Deploying Task App..."
                         if kubectl get deployment task-app -n default > /dev/null 2>&1; then
                             echo "Updating existing deployment..."
@@ -73,7 +73,7 @@ pipeline {
                             kubectl apply -f k8s/service.yaml
                             kubectl wait --for=condition=available --timeout=300s deployment/task-app -n default
                         fi
-                    '''
+                    """
                 }
             }
         }
@@ -81,16 +81,16 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh '''
+                    sh """
                         echo "Checking deployment status..."
                         kubectl get deployments -n default
                         kubectl get pods -n default -l app=task-app
                         kubectl get svc -n default
-                        
+
                         echo "Checking service endpoint..."
-                        NODEPORT=$(kubectl get svc python-app-service -n default -o jsonpath='{.spec.ports[0].nodePort}')
-                        echo "Task App is accessible at port: $NODEPORT"
-                    '''
+                        NODEPORT=\$(kubectl get svc python-app-service -n default -o jsonpath='{.spec.ports[0].nodePort}')
+                        echo "Task App is accessible at port: \$NODEPORT"
+                    """
                 }
             }
         }
@@ -100,11 +100,9 @@ pipeline {
         always {
             sh 'docker logout'
         }
-
         success {
             echo 'Pipeline executed successfully!'
         }
-
         failure {
             echo 'Pipeline failed! Check logs for more details.'
         }

@@ -8,5 +8,6 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard # ◄ TAMBAHKAN BARIS INI
   hostPath:
     path: /mnt/data/mysql
